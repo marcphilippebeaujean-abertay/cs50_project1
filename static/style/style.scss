@@ -1,0 +1,16 @@
+@import 'scss/nav';
+@import 'scss/utils';
+@import 'scss/home';
+
+$init-page-width: 1200px;
+
+body{
+  width: $init-page-width;
+  margin: 0px auto;
+}
+
+@media only screen and (max-width: $init-page-width) {
+  body{
+    width: 100%;
+  }
+}

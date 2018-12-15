@@ -8,18 +8,32 @@
         integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
         crossorigin="anonymous"
     />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style/style.css') }}"/>
     <title>Books Review</title>
 </head>
 <body>
     <div id="nav-bar">
-        <p1 id="website-logo">Book<span>Review</span>Deluxe</p1>
-        <div class="nav-section">
+        <h1 id="website-logo">Book<span class="colour-orange">Review</span>Deluxe
+        <img
+            src="{{ url_for('static', filename='images/book-3.png') }}"
+            alt="book icon"
+            class="book-logo"
+        /></h1>
+        <div id="nav-selections">
             <a>Home</a>
             <a>Register</a>
             <a>Log In</a>
         </div>
+        <img
+            src="{{ url_for('static', filename='images/book-3.png') }}"
+            alt="book icon"
+            class="book-logo"
+            id="phone-book-logo"
+        />
     </div>
-    {% block body %}
-    {% endblock %}
+    <div class="content">
+        {% block content %}
+        {% endblock %}
+    </div>
 </body>
 </html>

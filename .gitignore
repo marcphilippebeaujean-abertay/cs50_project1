@@ -88,3 +88,9 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# Sass map files
+*.map
+
+# Ignore data folder which contains big files
+/data

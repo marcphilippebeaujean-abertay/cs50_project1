@@ -1,0 +1,62 @@
+#nav-bar {
+  background-color: #66ffff;
+  height: 70px;
+  display: flex;
+  flex-direction: row;
+  font-size: 20px;
+  margin: 0px auto;
+  justify-content: space-between; }
+
+#nav-selections {
+  position: relative;
+  top: 25%;
+  margin-right: 20px; }
+  #nav-selections a {
+    color: aliceblue;
+    margin-left: 15px; }
+  #nav-selections a:hover {
+    cursor: pointer; }
+
+#website-logo {
+  position: relative;
+  top: 10%;
+  margin-left: 20px;
+  color: white; }
+
+#website-logo:hover {
+  cursor: none; }
+
+.colour-orange {
+  color: orange; }
+
+.book-logo {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  bottom: 20%; }
+
+#phone-book-logo {
+  display: none; }
+
+@media only screen and (max-width: 620px) {
+  #website-logo {
+    display: none; }
+
+  #phone-book-logo {
+    display: block;
+    bottom: 0%;
+    top: 25%;
+    margin-right: 15px; } }
+.slogan-main {
+  text-align: center;
+  letter-spacing: 0.6rem; }
+
+body {
+  width: 1200px;
+  margin: 0px auto; }
+
+@media only screen and (max-width: 1200px) {
+  body {
+    width: 100%; } }
+
+/*# sourceMappingURL=style.css.map */
