@@ -55,8 +55,19 @@
   background-color: orange;
   border-radius: 5px; }
 
-error-msg {
+.error-msg {
   color: red; }
+
+.success-disp {
+  width: 300px;
+  background-color: #89ef66;
+  height: 80px;
+  margin: 20px auto;
+  text-align: center;
+  border-radius: 5px; }
+
+.success-msg {
+  color: #657a76; }
 
 @media only screen and (max-width: 900px) {
   .base-form {

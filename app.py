@@ -8,6 +8,9 @@ import re
 import os
 app = Flask(__name__)
 
+if __name__ is "__main__":
+    app.run(debug=True)
+
 # Check for environment variable
 if not os.getenv('DATABASE_URL'):
     raise RuntimeError("DATABASE_URL is not set")
@@ -25,8 +28,8 @@ engine = create_engine(os.getenv('DATABASE_URL'))
 db = scoped_session(sessionmaker(bind=engine))
 
 @app.route("/")
-def index(redirect_msg=""):
-    return render_template("home.html", message=redirect_msg)
+def index():
+    return render_template("home.html")
 
 @app.route("/register")
 def register():
@@ -48,13 +51,15 @@ def register_user():
     if db.execute("SELECT * FROM users WHERE username =:username OR email =:email",
                   {'username': user_name, 'email': email}).rowcount > 0:
         return redirect(url_for('submission_error', message="User with username or email already registered."))
-    db.execute(
-        "INSERT INTO users (username, email, password) VALUES (:username, :email, :password)",
+    db.execute("INSERT INTO users (username, email, password) VALUES (:username, :email, :password)",
         {"username": user_name, "email": email, "password": password})
     db.commit()
-    return redirect(url_for('index', message=f'Successfully registered user {user_name}'))
+    return redirect(url_for('submission_success', message=f'User {user_name} has been registered!'))
 
 @app.route("/submission_error/<string:message>")
 def submission_error(message):
     return render_template("error.html", message=message)
 
+@app.route("/submission_success/<string:message>")
+def submission_success(message):
+    return render_template("success.html", message=message)

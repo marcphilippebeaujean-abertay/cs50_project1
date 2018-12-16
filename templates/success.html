@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block title %}
+Success
+{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block content %}
+    <div class="success-disp">
+        <h1 class="success-msg">Success!</h1>
+        <p class="success-msg">{{ message }}</p>
+    </div>
+{% endblock %}
