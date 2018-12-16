@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block title %}Index{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block content %}
+  <form class="base-form"
+        name="user-login"
+        action="{{ url_for("login_user") }}"
+        method="post"
+  >
+    <h1>Login</h1>
+    <div class="form-group">
+      <label for="user-login-id">User Name/Email</label>
+      <input type="text"
+             class="form-control"
+             id="user-login-id"
+             placeholder="Enter User Name or Email"
+             name="login-id"
+      >
+    </div>
+    <div class="form-group">
+      <label for="password-input">Password</label>
+      <input type="password"
+             class="form-control"
+             id="password-input"
+             placeholder="Password"
+             name="pass"
+      >
+    </div>
+    <button type="submit" class="btn btn-primary">Login</button>
+  </form>
+{% endblock %}

@@ -56,6 +56,14 @@ def register_user():
     db.commit()
     return redirect(url_for('submission_success', message=f'User {user_name} has been registered!'))
 
+@app.route("/login")
+def login():
+    return render_template("login.html")
+
+@app.route("/login-user")
+def login_user():
+    return redirect(url_for('submission_success', message=f'Logged in user!'))
+
 @app.route("/submission_error/<string:message>")
 def submission_error(message):
     return render_template("error.html", message=message)
