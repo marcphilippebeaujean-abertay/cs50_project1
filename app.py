@@ -12,7 +12,9 @@ app = Flask(__name__)
 if not os.getenv('DATABASE_URL'):
     raise RuntimeError("DATABASE_URL is not set")
 
-EMAIL_REGEX = re.compile(r"[^@]+@[^@]+\.[^@]+")
+email_regex = re.compile(r"^(?!.*[A-Z])(?!.*[\s])([\w]+)([.][\w]+)?[@][\w]+[.][a-z]+")
+pw_regex = re.compile(
+    r'(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?!.*\s)(?=.{7,})')
 
 # Configure session to use filesystem
 app.config["SESSION_PERMANENT"] = False
@@ -34,12 +36,19 @@ def register():
 @app.route("/handle-registration", methods=["POST"])
 def register_user():
     email = request.form.get("email")
-    if not EMAIL_REGEX.match(email):
-        return redirect(url_for('submission_error', message="Invalid email!"))
+    if not email_regex.match(email):
+        return redirect(url_for('submission_error', message="Invalid email."))
     user_name = request.form.get("user-name")
+    if len(user_name) < 4:
+        return redirect(url_for('submission_error', message="Please enter a longer user name."))
+    if re.match('\s', user_name):
+        return redirect(url_for('submission_error', message="Please don't include whitespace in your user name."))
     password = request.form.get("pass")
-    return render_template("home.html")
+    if not pw_regex.match(password):
+        return redirect(url_for('submission_error', message="Please choose a safer password."))
+    return redirect(url_for('index'))
 
 @app.route("/submission_error/<string:message>")
 def submission_error(message):
     return render_template("error.html", message=message)
+
