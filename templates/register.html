@@ -4,19 +4,38 @@
   {{ super() }}
 {% endblock %}
 {% block content %}
-  <form class="base-form">
+  <form class="base-form"
+        name="user-registration"
+        action="{{ url_for("register_user") }}"
+        method="post"
+  >
     <h1>Register</h1>
     <div class="form-group">
       <label for="user-input-name">User Name</label>
-      <input type="user-name" class="form-control" id="user-input-name" placeholder="Enter User Name">
+      <input type="text"
+             class="form-control"
+             id="user-input-name"
+             placeholder="Enter User Name"
+             name="user-name"
+      >
     </div>
     <div class="form-group">
-      <label for="user-email">Email</label>
-      <input type="email" class="form-control" id="user-input-name" placeholder="Enter Email">
+      <label for="user-input-email">Email</label>
+      <input type="text"
+             class="form-control"
+             id="user-input-email"
+             placeholder="Enter Email"
+             name="email"
+      >
     </div>
     <div class="form-group">
       <label for="password-input">Password</label>
-      <input type="password" class="form-control" id="password-input" placeholder="Password">
+      <input type="password"
+             class="form-control"
+             id="password-input"
+             placeholder="Password"
+             name="pass"
+      >
     </div>
     <button type="submit" class="btn btn-primary">Register</button>
   </form>

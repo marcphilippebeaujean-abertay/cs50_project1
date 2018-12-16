@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block title %}
+Error
+{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block content %}
+    <h1>Oops! Something went wrong.</h1>
+    <h3 class="lead error-msg">{{ message }}</h3>
+{% endblock %}
