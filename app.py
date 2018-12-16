@@ -45,7 +45,11 @@ def register_user():
         return redirect(url_for('submission_error', message="Please don't include whitespace in your user name."))
     password = request.form.get("pass")
     if not pw_regex.match(password):
-        return redirect(url_for('submission_error', message="Please choose a safer password."))
+        return redirect(url_for('submission_error', message="Please enter valid password (minimum specs: 6 characters, capital and lowercase letters, one digit and no white space."))
+    db.execute(
+        "INSERT INTO users (username, email, password) VALUES (:username, :email, :password)",
+        {"username": user_name, "email": email, "password": password})
+    db.commit()
     return redirect(url_for('index'))
 
 @app.route("/submission_error/<string:message>")
