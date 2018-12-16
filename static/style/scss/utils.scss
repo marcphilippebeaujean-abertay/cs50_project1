@@ -1,1 +1,15 @@
+$init-form-width: 800px;
 
+.base-form{
+  width: $init-form-width;
+  margin: 50px auto;
+  padding: 2px 20px 20px 20px;
+  background-color: orange;
+  border-radius: 5px;
+}
+
+@media only screen and (max-width: #{$init-form-width+100px}) {
+  .base-form{
+    width: 90%;
+  }
+}
