@@ -4,6 +4,11 @@
   {{ super() }}
 {% endblock %}
 {% block content %}
+  {% if message != "" %}
+      <div class="alert alert-success" role="alert">
+        {{ message }}
+      </div>
+  {% endif %}
   <h1 class="slogan-main">Thousands of Book Reviews.</h1>
   <h2 class="slogan-main">One Search Away.</h2>
 {% endblock %}

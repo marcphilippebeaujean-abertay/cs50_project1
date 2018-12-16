@@ -13,8 +13,7 @@ if not os.getenv('DATABASE_URL'):
     raise RuntimeError("DATABASE_URL is not set")
 
 email_regex = re.compile(r"^(?!.*[A-Z])(?!.*[\s])([\w]+)([.][\w]+)?[@][\w]+[.][a-z]+")
-pw_regex = re.compile(
-    r'(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?!.*\s)(?=.{7,})')
+pw_regex = re.compile(r'(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?!.*\s)(?=.{7,})')
 
 # Configure session to use filesystem
 app.config["SESSION_PERMANENT"] = False
@@ -26,8 +25,8 @@ engine = create_engine(os.getenv('DATABASE_URL'))
 db = scoped_session(sessionmaker(bind=engine))
 
 @app.route("/")
-def index():
-    return render_template("home.html")
+def index(redirect_msg=""):
+    return render_template("home.html", message=redirect_msg)
 
 @app.route("/register")
 def register():
@@ -46,11 +45,14 @@ def register_user():
     password = request.form.get("pass")
     if not pw_regex.match(password):
         return redirect(url_for('submission_error', message="Please enter valid password (minimum specs: 6 characters, capital and lowercase letters, one digit and no white space."))
+    if db.execute("SELECT * FROM users WHERE username =:username OR email =:email",
+                  {'username': user_name, 'email': email}).rowcount > 0:
+        return redirect(url_for('submission_error', message="User with username or email already registered."))
     db.execute(
         "INSERT INTO users (username, email, password) VALUES (:username, :email, :password)",
         {"username": user_name, "email": email, "password": password})
     db.commit()
-    return redirect(url_for('index'))
+    return redirect(url_for('index', message=f'Successfully registered user {user_name}'))
 
 @app.route("/submission_error/<string:message>")
 def submission_error(message):
