@@ -21,8 +21,12 @@
         /></h1>
         <div id="nav-selections">
             <a href="/">Home</a>
-            <a href="/register">Register</a>
-            <a href="/login">Log In</a>
+            {% if logged_in %}
+                <a href="/logout">Log Out</a>
+            {% else %}
+                <a href="/register">Register</a>
+                <a href="/login">Log In</a>
+            {% endif %}
         </div>
         <img
             src="{{ url_for('static', filename='images/book-3.png') }}"

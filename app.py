@@ -16,12 +16,14 @@ if not os.getenv('DATABASE_URL'):
     raise RuntimeError("DATABASE_URL is not set")
 
 email_regex = re.compile(r"^(?!.*[A-Z])(?!.*[\s])([\w]+)([.][\w]+)?[@][\w]+[.][a-z]+")
-pw_regex = re.compile(r'(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?!.*\s)(?=.{7,})')
+pw_regex = re.compile(r'(?!.*\s)(?=.{7,})')
 
 # Configure session to use filesystem
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
+
+user=""
 
 # Set up database
 engine = create_engine(os.getenv('DATABASE_URL'))
@@ -29,7 +31,10 @@ db = scoped_session(sessionmaker(bind=engine))
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    return render_template("home.html")
+    if session.get('user') is None:
+        session['user']=""
+    logged_in = (len(session['user'])>0)
+    return render_template("home.html", logged_in=logged_in)
 
 @app.route("/register")
 def register():
@@ -47,13 +52,14 @@ def register_user():
         return redirect(url_for('submission_error', message="Please don't include whitespace in your user name."))
     password = request.form.get("pass")
     if not pw_regex.match(password):
-        return redirect(url_for('submission_error', message="Please enter valid password (minimum specs: 6 characters, capital and lowercase letters, one digit and no white space."))
+        return redirect(url_for('submission_error', message="Please enter valid password (minimum specs: 6 characters, no white space."))
     if db.execute("SELECT * FROM users WHERE username =:username OR email =:email",
                   {'username': user_name, 'email': email}).rowcount > 0:
         return redirect(url_for('submission_error', message="User with username or email already registered."))
     db.execute("INSERT INTO users (username, email, password) VALUES (:username, :email, :password)",
         {"username": user_name, "email": email, "password": password})
     db.commit()
+    #session['user'] = user_name
     return redirect(url_for('submission_success', message=f'User {user_name} has been registered!'))
 
 @app.route("/login")
@@ -68,6 +74,7 @@ def login_user():
                     {"username": user_name, "password": req_pw}).rowcount != 1:
         return redirect(url_for('submission_error', message="Login failed! Check your password and username."))
     else:
+        session['user'] = user_name
         return redirect(url_for('submission_success', message=f'Logged in user {user_name}!'))
 
 @app.route("/submission_error/<string:message>")
