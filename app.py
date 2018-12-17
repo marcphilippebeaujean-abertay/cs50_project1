@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template, request, url_for, redirect
+from flask import Flask, render_template, request, url_for, redirect, session
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -27,7 +27,7 @@ Session(app)
 engine = create_engine(os.getenv('DATABASE_URL'))
 db = scoped_session(sessionmaker(bind=engine))
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index():
     return render_template("home.html")
 
@@ -60,9 +60,15 @@ def register_user():
 def login():
     return render_template("login.html")
 
-@app.route("/login-user")
+@app.route("/login-user", methods=["POST"])
 def login_user():
-    return redirect(url_for('submission_success', message=f'Logged in user!'))
+    user_name = request.form.get("user")
+    req_pw = request.form.get("pass")
+    if db.execute("SELECT password FROM users WHERE username =:username AND password =:password",
+                    {"username": user_name, "password": req_pw}).rowcount != 1:
+        return redirect(url_for('submission_error', message="Login failed! Check your password and username."))
+    else:
+        return redirect(url_for('submission_success', message=f'Logged in user {user_name}!'))
 
 @app.route("/submission_error/<string:message>")
 def submission_error(message):
