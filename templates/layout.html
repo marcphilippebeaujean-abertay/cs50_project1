@@ -22,7 +22,7 @@
         <div id="nav-selections">
             <a href="/">Home</a>
             {% if logged_in %}
-                <a href="/logout">Log Out</a>
+                <a href="{{ url_for("logout_user") }}">Log Out</a>
             {% else %}
                 <a href="/register">Register</a>
                 <a href="/login">Log In</a>

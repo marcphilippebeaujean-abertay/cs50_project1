@@ -29,12 +29,14 @@ user=""
 engine = create_engine(os.getenv('DATABASE_URL'))
 db = scoped_session(sessionmaker(bind=engine))
 
-@app.route("/", methods=["GET", "POST"])
-def index():
+def is_logged_in():
     if session.get('user') is None:
         session['user']=""
-    logged_in = (len(session['user'])>0)
-    return render_template("home.html", logged_in=logged_in)
+    return (len(session['user'])>0)
+
+@app.route("/", methods=["GET", "POST"])
+def index():
+    return render_template("home.html", logged_in=is_logged_in())
 
 @app.route("/register")
 def register():
@@ -59,7 +61,7 @@ def register_user():
     db.execute("INSERT INTO users (username, email, password) VALUES (:username, :email, :password)",
         {"username": user_name, "email": email, "password": password})
     db.commit()
-    #session['user'] = user_name
+    session['user'] = user_name
     return redirect(url_for('submission_success', message=f'User {user_name} has been registered!'))
 
 @app.route("/login")
@@ -79,8 +81,14 @@ def login_user():
 
 @app.route("/submission_error/<string:message>")
 def submission_error(message):
-    return render_template("error.html", message=message)
+    return render_template("error.html", message=message, logged_in=is_logged_in())
 
 @app.route("/submission_success/<string:message>")
 def submission_success(message):
-    return render_template("success.html", message=message)
+    return render_template("success.html", message=message, logged_in=is_logged_in())
+
+@app.route("/logout_user")
+def logout_user():
+    prev_user = session['user']
+    session['user'] = ""
+    return redirect(url_for('submission_success', message=f'Logged in user {prev_user}!'))
