@@ -6,4 +6,20 @@
 {% block content %}
   <h1 class="slogan-main">Thousands of Book Reviews.</h1>
   <h2 class="slogan-main">One Search Away.</h2>
+    {% if logged_in %}
+        <form class="base-form"
+        name="user-login"
+        action="{{ url_for("book_search") }}"
+        method="post"
+        >
+            <label for="user-input-name">Book Name</label>
+                <input type="text"
+                    class="form-control"
+                    id="user-input-name"
+                    placeholder="Enter Book Name"
+                    name="book-term"
+                >
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+    {% endif %}
 {% endblock %}

@@ -91,4 +91,17 @@ def submission_success(message):
 def logout_user():
     prev_user = session['user']
     session['user'] = ""
-    return redirect(url_for('submission_success', message=f'Logged in user {prev_user}!'))
+    return redirect(url_for('submission_success', message=f'Logged out user {prev_user}!'))
+
+@app.route("/book_search", methods=["POST"])
+def book_search():
+    search_term = request.form.get("book-term")
+    if search_term is None:
+        return redirect(url_for('submission_error', message="Couldn't process search."))
+    # add sequel operator to search at beginning of string
+    books = db.execute("SELECT * FROM books").fetchall()
+    books = [book for book in books if book.title.startswith(search_term)]
+    if len(books)<=0:
+        return redirect(url_for('submission_error', message="No books found."))
+    return render_template("booklist.html", books=books, logged_in=is_logged_in())
+

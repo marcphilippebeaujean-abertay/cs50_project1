@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block title %}Index{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block content %}
+  {% for book in books %}
+    <div class="book-section">
+        <h1>{{ book.title }}</h1>
+    </div>
+  {% endfor %}
+{% endblock %}
