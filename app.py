@@ -95,13 +95,19 @@ def logout_user():
 
 @app.route("/book_search", methods=["POST"])
 def book_search():
-    search_term = request.form.get("book-term")
+    search_term = request.form.get("book-term").upper()
     if search_term is None:
         return redirect(url_for('submission_error', message="Couldn't process search."))
     # add sequel operator to search at beginning of string
     books = db.execute("SELECT * FROM books").fetchall()
-    books = [book for book in books if book.title.startswith(search_term)]
+    # search term and book title are transformed to uppercase
+    books = [book for book in books if book.title.upper().startswith(search_term)]
     if len(books)<=0:
         return redirect(url_for('submission_error', message="No books found."))
     return render_template("booklist.html", books=books, logged_in=is_logged_in())
 
+@app.route("/write_review/<string:isbn>")
+def write_review(isbn):
+    book = db.execute("SELECT * FROM books WHERE isbn =:isbn",
+                      {"isbn": isbn}).fetchone()
+    return render_template("review.html", book=book, logged_in=is_logged_in())

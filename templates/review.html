@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block title %}Index{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block content %}
+    <div class="book-section">
+        <h3>{{ book.title }}</h3>
+    </div>
+{% endblock %}

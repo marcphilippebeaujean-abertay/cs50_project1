@@ -6,7 +6,14 @@
 {% block content %}
   {% for book in books %}
     <div class="book-section">
-        <h1>{{ book.title }}</h1>
+        <h3>{{ book.title }}</h3>
+        <p>Author: {{ book.author }}</p>
+        <p>Year Published: {{ book.year_published }}</p>
+        <p>ISBN: {{ book.isbn }}</p>
+        <p>
+            <a class="btn btn-info btn-xs" href="{{ url_for('write_review', isbn=book.isbn)}}">Write Review</a>
+            <a>View Reviews</a>
+        </p>
     </div>
   {% endfor %}
 {% endblock %}
