@@ -111,3 +111,7 @@ def write_review(isbn):
     book = db.execute("SELECT * FROM books WHERE isbn =:isbn",
                       {"isbn": isbn}).fetchone()
     return render_template("review.html", book=book, logged_in=is_logged_in())
+
+@app.route("/submit_review")
+def submit_review():
+    return redirect(url_for('submission_success', message=f'Review submitted!'))
