@@ -1,9 +1,8 @@
-import os
-
 from flask import Flask, render_template, request, url_for, redirect, session
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
+from models import *
 import re
 import os
 app = Flask(__name__)
@@ -21,6 +20,9 @@ pw_regex = re.compile(r'(?!.*\s)(?=.{7,})')
 # Configure session to use filesystem
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
+app.config["SQLALCHEMY_DATABASE_URI"]=os.getenv("DATABASE_URL")
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"]=False
+db.init_app(app)
 Session(app)
 
 user=""
@@ -95,13 +97,11 @@ def logout_user():
 
 @app.route("/book_search", methods=["POST"])
 def book_search():
-    search_term = request.form.get("book-term").upper()
+    search_term = request.form.get("book-term")+"%"
     if search_term is None:
         return redirect(url_for('submission_error', message="Couldn't process search."))
     # add sequel operator to search at beginning of string
-    books = db.execute("SELECT * FROM books").fetchall()
-    # search term and book title are transformed to uppercase
-    books = [book for book in books if book.title.upper().startswith(search_term)]
+    books = Book.query.filter(Book.title.like(search_term)).all()
     if len(books)<=0:
         return redirect(url_for('submission_error', message="No books found."))
     return render_template("booklist.html", books=books, logged_in=is_logged_in())
