@@ -60,9 +60,8 @@ def register_user():
     if db.execute("SELECT * FROM users WHERE username =:username OR email =:email",
                   {'username': user_name, 'email': email}).rowcount > 0:
         return redirect(url_for('submission_error', message="User with username or email already registered."))
-    db.execute("INSERT INTO users (username, email, password) VALUES (:username, :email, :password)",
-        {"username": user_name, "email": email, "password": password})
-    db.commit()
+    user = User(username=user_name, email=email, password=password)
+    db.session.add(user)
     session['user'] = user_name
     return redirect(url_for('submission_success', message=f'User {user_name} has been registered!'))
 
