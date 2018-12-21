@@ -16,7 +16,7 @@
                  class="form-control"
                  id="review-title"
                  placeholder="Enter Title for Review"
-                 name="user"
+                 name="review-title"
           >
         </div>
         <div class="form-group">
@@ -26,9 +26,11 @@
                  id="review"
                  cols="50"
                  rows="10"
-                 name="review-main"
+                 name="review-body"
+                 placeholder="Min 8, Max 300 Characters"
           ></textarea>
         </div>
+        <input type="hidden" name="isbn" value={{ book.isbn }}>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 {% endblock %}

@@ -112,6 +112,11 @@ def write_review(isbn):
                       {"isbn": isbn}).fetchone()
     return render_template("review.html", book=book, logged_in=is_logged_in())
 
-@app.route("/submit_review")
+@app.route("/submit_review", methods=["POST"])
 def submit_review():
-    return redirect(url_for('submission_success', message=f'Review submitted!'))
+    review_body = request.form.get("review-body")
+    if len(review_body)<8:
+        return redirect(url_for('submission_error', message=f'Review too short!'))
+    if len(review_body)>300:
+        return redirect(url_for('submission_error', message=f'Review too long!'))
+    return redirect(url_for('submission_success', message=f'Review submitted successfully!'))
