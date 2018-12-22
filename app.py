@@ -1,5 +1,3 @@
-import os
-
 from flask import Flask, render_template, request, url_for, redirect, session
 from flask_session import Session
 from sqlalchemy import create_engine
@@ -119,4 +117,7 @@ def submit_review():
         return redirect(url_for('submission_error', message=f'Review too short!'))
     if len(review_body)>300:
         return redirect(url_for('submission_error', message=f'Review too long!'))
+    db.execute("INSERT INTO reviews (author, review, isbn) VALUES (:author, :review, :isbn)",
+               {"author": session['user'], "review": review_body, "isbn": request.form.get("isbn")})
+    db.commit()
     return redirect(url_for('submission_success', message=f'Review submitted successfully!'))
