@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block title %}Index{% endblock %}
+{% block head %}
+  {{ super() }}
+{% endblock %}
+{% block content %}
+    <h1>Reviews for {{ book_title }}</h1>
+    <h2>Average Rating: {{ avg_rating }} from {{ review_count }} reviews</h2>
+    <div class="review">
+        {% for review in reviews %}
+            <p class="lead">{{ review.review }}</p>
+            <p>Author: {{ review.author }}</p>
+            <p>Rating: {{ review.score }}</p>
+        {% endfor %}
+    </div>
+{% endblock %}

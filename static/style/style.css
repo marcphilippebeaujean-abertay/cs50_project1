@@ -69,6 +69,14 @@
 .success-msg {
   color: #657a76; }
 
+.review {
+  width: 300px;
+  margin: 20px 0px;
+  background-color: orange;
+  border-radius: 5px; }
+  .review p {
+    margin: 0px 5px; }
+
 @media only screen and (max-width: 900px) {
   .base-form {
     width: 90%; } }

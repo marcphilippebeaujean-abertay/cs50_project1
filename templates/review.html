@@ -30,6 +30,11 @@
                  placeholder="Min 8, Max 300 Characters"
           ></textarea>
         </div>
+        <div class="form-group">
+            <label for="review-score">Rating</label>
+            <input type="number" id="review-score" name="score"
+                   min="0" max="5">
+        </div>
         <input type="hidden" name="isbn" value={{ book.isbn }}>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>

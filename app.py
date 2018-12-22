@@ -4,6 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 import re
 import os
+import requests
 app = Flask(__name__)
 
 if __name__ is "__main__":
@@ -12,6 +13,9 @@ if __name__ is "__main__":
 # Check for environment variable
 if not os.getenv('DATABASE_URL'):
     raise RuntimeError("DATABASE_URL is not set")
+
+gr_dev_key = os.getenv('GOODREADS_DEV_KEY')
+
 
 email_regex = re.compile(r"^(?!.*[A-Z])(?!.*[\s])([\w]+)([.][\w]+)?[@][\w]+[.][a-z]+")
 pw_regex = re.compile(r'(?!.*\s)(?=.{7,})')
@@ -42,6 +46,8 @@ def register():
 
 @app.route("/handle-registration", methods=["POST"])
 def register_user():
+    if is_logged_in():
+        return redirect(url_for('submission_error', message="Please log out first."))
     email = request.form.get("email")
     if not email_regex.match(email):
         return redirect(url_for('submission_error', message="Invalid email."))
@@ -68,6 +74,8 @@ def login():
 
 @app.route("/login-user", methods=["POST"])
 def login_user():
+    if is_logged_in():
+        return redirect(url_for('submission_error', message="Already logged in."))
     user_name = request.form.get("user")
     req_pw = request.form.get("pass")
     if db.execute("SELECT password FROM users WHERE username =:username AND password =:password",
@@ -87,6 +95,8 @@ def submission_success(message):
 
 @app.route("/logout_user")
 def logout_user():
+    if not is_logged_in():
+        return redirect(url_for('submission_error', message="Please log in to log out."))
     prev_user = session['user']
     session['user'] = ""
     return redirect(url_for('submission_success', message=f'Logged out user {prev_user}!'))
@@ -102,13 +112,35 @@ def book_search():
     books = [book for book in books if book.title.upper().startswith(search_term)]
     if len(books)<=0:
         return redirect(url_for('submission_error', message="No books found."))
-    return render_template("booklist.html", books=books, logged_in=is_logged_in())
+    return render_template("booklist.html", books=books, logged_in=True)
 
 @app.route("/write_review/<string:isbn>")
 def write_review(isbn):
+    if not is_logged_in():
+        return redirect(url_for('submission_error', message="Please log in to write reviews."))
     book = db.execute("SELECT * FROM books WHERE isbn =:isbn",
                       {"isbn": isbn}).fetchone()
-    return render_template("review.html", book=book, logged_in=is_logged_in())
+    return render_template("review.html", book=book, logged_in=True)
+
+@app.route("/view_reviews/<string:isbn>")
+def view_reviews(isbn):
+    gr_api_request = requests.get("https://www.goodreads.com/book/review_counts.json",
+                        params={'isbns': isbn, 'key': gr_dev_key, 'format': 'json'})
+    if gr_api_request.status_code!=200:
+        raise Exception("ERROR: API request unsuccessful")
+    gr_review_data = gr_api_request.json()['books'][0]
+    if not is_logged_in():
+        return redirect(url_for('submission_error', message="Please log in to view reviews."))
+    reviews = db.execute("SELECT * FROM reviews WHERE isbn =:isbn",
+                      {"isbn": isbn}).fetchall()
+    book_title = db.execute("SELECT * FROM books WHERE isbn =:isbn",
+                      {"isbn": isbn}).fetchone().title
+    return render_template("reviewlist.html",
+                           book_title=book_title,
+                           review_count=gr_review_data["ratings_count"]+len(reviews),
+                           avg_rating=gr_review_data["average_rating"],
+                           reviews=reviews,
+                           logged_in=True)
 
 @app.route("/submit_review", methods=["POST"])
 def submit_review():
@@ -117,7 +149,8 @@ def submit_review():
         return redirect(url_for('submission_error', message=f'Review too short!'))
     if len(review_body)>300:
         return redirect(url_for('submission_error', message=f'Review too long!'))
-    db.execute("INSERT INTO reviews (author, review, isbn) VALUES (:author, :review, :isbn)",
-               {"author": session['user'], "review": review_body, "isbn": request.form.get("isbn")})
+    db.execute("INSERT INTO reviews (author, review, isbn, score) VALUES (:author, :review, :isbn, :score)",
+               {"author": session['user'], "review": review_body, "isbn": request.form.get("isbn"), "score": request.form.get("score")})
     db.commit()
     return redirect(url_for('submission_success', message=f'Review submitted successfully!'))
+
