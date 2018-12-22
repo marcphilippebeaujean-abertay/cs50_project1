@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for, redirect, session
+from flask import Flask, render_template, request, url_for, redirect, session, jsonify
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -111,7 +111,7 @@ def book_search():
     # search term and book title are transformed to uppercase
     books = [book for book in books if book.title.upper().startswith(search_term)]
     if len(books)<=0:
-        return redirect(url_for('submission_error', message="No books found."))
+        return redirect(url_for('submission_error', message="Error 404: No books found."))
     return render_template("booklist.html", books=books, logged_in=True)
 
 @app.route("/write_review/<string:isbn>")
@@ -154,3 +154,19 @@ def submit_review():
     db.commit()
     return redirect(url_for('submission_success', message=f'Review submitted successfully!'))
 
+@app.route("/api/<string:isbn>")
+def review_api(isbn):
+    book = db.execute("SELECT * FROM books WHERE isbn =:isbn",
+                      {"isbn": isbn}).fetchone()
+    if book is None:
+        return jsonify({"error": "Invalid book isbn"}), 404
+    gr_api_request = requests.get("https://www.goodreads.com/book/review_counts.json",
+                                  params={'isbns': isbn, 'key': gr_dev_key, 'format': 'json'})
+    gr_review_data = gr_api_request.json()['books'][0]
+    return jsonify({
+        "title": book.title,
+        "author": book.author,
+        "year": book.year_published,
+        "review_count": gr_review_data["ratings_count"],
+        "average_score": gr_review_data["average_rating"]
+    })
